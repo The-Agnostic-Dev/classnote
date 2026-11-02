@@ -18,7 +18,7 @@ BOARD_CACHE_KEY = "notices:board"
 def active_notices(today: date | None = None) -> list[Notice]:
     today = today or timezone.localdate()
     queryset = (
-        Notice.objects.filter(Q(expires_on__isnull=True) | Q(expires_on__gt=today))
+        Notice.objects.filter(Q(expires_on__isnull=True) | Q(expires_on__gte=today))
         .select_related("author")
         .prefetch_related("audience")
     )
