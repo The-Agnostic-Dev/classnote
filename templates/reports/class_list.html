@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Classes{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Classes &amp; results</h1>
+  {% if term %}<p class="muted">Current term: {{ term.name }}</p>{% endif %}
+</div>
+{% for school_class in classes %}
+<section class="card" data-class-id="{{ school_class.pk }}">
+  <div class="section-head">
+    <h2>{{ school_class.name }}</h2>
+    <a class="button" href="{% url 'reports:results' school_class.pk %}">View results</a>
+  </div>
+  <p class="muted">
+    Class teacher: {{ school_class.class_teacher.get_full_name|default:"Not assigned" }} ·
+    {{ school_class.students.all|length }} student{{ school_class.students.all|length|pluralize }}
+  </p>
+  <p class="subjects">
+    Enter scores:
+    {% for subject in subjects %}
+      <a href="{% url 'reports:enter_scores' school_class.pk subject.pk %}">{{ subject.name }}</a>{% if not forloop.last %} · {% endif %}
+    {% endfor %}
+  </p>
+</section>
+{% endfor %}
+{% endblock %}

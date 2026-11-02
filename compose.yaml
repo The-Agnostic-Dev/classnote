@@ -1,0 +1,10 @@
+services:
+  classnote:
+    build: .
+    ports:
+      - "5106:5106"
+    environment:
+      DJANGO_DEBUG: "0"
+      DJANGO_ALLOWED_HOSTS: "*"
+      DJANGO_CSRF_TRUSTED_ORIGINS: "http://localhost:5106,http://127.0.0.1:5106"
+    restart: unless-stopped

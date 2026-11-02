@@ -1,0 +1,35 @@
+{% load static %}<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Classnote{% endblock %} · Classnote</title>
+  <link rel="stylesheet" href="{% static 'css/site.css' %}">
+  <link rel="icon" href="{% static 'favicon.svg' %}" type="image/svg+xml">
+</head>
+<body>
+  <header class="topbar no-print">
+    <a class="brand" href="{% url 'notices:board' %}">Classnote</a>
+    <nav aria-label="Main">
+      <a href="{% url 'notices:board' %}">Notice board</a>
+      {% if user.is_authenticated %}
+        <a href="{% url 'notices:dashboard' %}">Dashboard</a>
+        <a href="{% url 'reports:class_list' %}">Classes &amp; results</a>
+        <span class="who">{{ user.get_full_name|default:user.username }}</span>
+        <a href="{% url 'logout' %}" class="button-link">Log out</a>
+      {% else %}
+        <a href="{% url 'login' %}" class="button-link">Teacher login</a>
+      {% endif %}
+    </nav>
+  </header>
+  <main class="page">
+    {% if messages %}
+      <ul class="messages no-print">
+        {% for message in messages %}<li class="message {{ message.tags }}" role="status">{{ message }}</li>{% endfor %}
+      </ul>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="footer no-print">Classnote · Greenfield Model College</footer>
+</body>
+</html>

@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Welcome, {{ user.first_name|default:user.username }}</h1>
+  <a class="button primary" href="{% url 'notices:create' %}">New notice</a>
+</div>
+
+{% if form_classes %}
+<section class="card">
+  <h2>Your form class</h2>
+  <ul class="plain">
+    {% for school_class in form_classes %}
+      <li><a href="{% url 'reports:results' school_class.pk %}">{{ school_class.name }} results</a></li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+<section class="card">
+  <h2>Your notices</h2>
+  {% if my_notices %}
+  <table class="table">
+    <thead><tr><th>Title</th><th>Audience</th><th>Posted</th><th>Expires</th><th></th></tr></thead>
+    <tbody>
+      {% for notice in my_notices %}
+      <tr data-notice-id="{{ notice.pk }}">
+        <td>{% if notice.pinned %}<span class="tag pin">Pinned</span> {% endif %}<a href="{{ notice.get_absolute_url }}">{{ notice.title }}</a></td>
+        <td>{{ notice.audience_label }}</td>
+        <td>{{ notice.published_at|date:"j M Y" }}</td>
+        <td>{{ notice.expires_on|date:"j M Y"|default:"-" }}</td>
+        <td class="actions">
+          <a href="{% url 'notices:edit' notice.pk %}">Edit</a>
+          <a href="{% url 'notices:delete' notice.pk %}">Take down</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="muted">You haven't posted anything yet.</p>
+  {% endif %}
+</section>
+{% endblock %}

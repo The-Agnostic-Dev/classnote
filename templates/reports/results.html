@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}{{ school_class.name }} results{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>{{ school_class.name }} results</h1>
+  <form method="get" class="inline-form">
+    <label for="term-select">Term</label>
+    <select id="term-select" name="term" onchange="this.form.submit()">
+      {% for option in terms %}
+        <option value="{{ option.pk }}" {% if option.pk == request.GET.term %}selected{% endif %}>{{ option.name }}</option>
+      {% endfor %}
+    </select>
+    <noscript><button type="submit">Show</button></noscript>
+  </form>
+</div>
+<p class="muted">Showing {{ term.name }}. Positions are by average across all subjects.</p>
+
+<table class="table results" data-testid="results">
+  <thead>
+    <tr><th>Position</th><th>Student</th><th>Admission no.</th><th class="num">Average</th><th>Grade</th><th></th></tr>
+  </thead>
+  <tbody>
+    {% for row in rows %}
+    <tr data-student-id="{{ row.student.pk }}">
+      <td class="position">{% if row.position %}{{ row.position|ordinal }}{% else %}-{% endif %}</td>
+      <td class="student">{{ row.student.full_name }}</td>
+      <td>{{ row.student.admission_no }}</td>
+      <td class="num average">{{ row.average|default:"-" }}</td>
+      <td class="grade">{{ row.grade }}</td>
+      <td><a href="{% url 'reports:report_card' row.student.pk %}?term={{ term.pk }}">Report card</a></td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="6" class="muted">No students in this class yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<p class="subjects">
+  Enter {{ term.name }} scores:
+  {% for subject in subjects %}
+    <a href="{% url 'reports:enter_scores' school_class.pk subject.pk %}?term={{ term.pk }}">{{ subject.name }}</a>{% if not forloop.last %} · {% endif %}
+  {% endfor %}
+</p>
+{% endblock %}

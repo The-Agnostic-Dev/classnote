@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Report card · {{ student.full_name }}{% endblock %}
+{% block content %}
+<div class="page-head no-print">
+  <form method="get" class="inline-form">
+    <label for="term-select">Term</label>
+    <select id="term-select" name="term" onchange="this.form.submit()">
+      {% for option in terms %}
+        <option value="{{ option.pk }}" {% if option == term %}selected{% endif %}>{{ option.name }}</option>
+      {% endfor %}
+    </select>
+  </form>
+  <button type="button" class="primary" onclick="window.print">Print report card</button>
+</div>
+
+<article class="report-card card">
+  <header class="report-head">
+    <div>
+      <p class="school">Greenfield Model College</p>
+      <h1>Report card</h1>
+      <p class="muted">{{ term.name }}</p>
+    </div>
+    <dl class="facts">
+      <dt>Student</dt><dd data-testid="student-name">{{ student.full_name }}</dd>
+      <dt>Admission no.</dt><dd>{{ student.admission_no }}</dd>
+      <dt>Class</dt><dd>{{ student.school_class.name }}</dd>
+      <dt>Class teacher</dt><dd>{{ student.school_class.class_teacher.get_full_name|default:"-" }}</dd>
+    </dl>
+  </header>
+
+  <table class="table report" data-testid="report-lines">
+    <thead>
+      <tr><th>Subject</th><th class="num">CA (40)</th><th class="num">Exam (60)</th><th class="num">Total (100)</th><th>Grade</th><th>Remark</th></tr>
+    </thead>
+    <tbody>
+      {% for line in lines %}
+      <tr>
+        <td class="subject">{{ line.subject }}</td>
+        <td class="num">{{ line.exam }}</td>
+        <td class="num">{{ line.ca }}</td>
+        <td class="num total">{{ line.total }}</td>
+        <td class="grade">{{ line.grade }}</td>
+        <td class="remark">{{ line.remark }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6" class="muted">No scores recorded for this term.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <dl class="summary">
+    <div><dt>Total score</dt><dd data-testid="total-points">{{ total_points }}</dd></div>
+    <div><dt>Average</dt><dd data-testid="average">{{ average|default:"-" }}</dd></div>
+    <div><dt>Overall grade</dt><dd>{{ overall_grade }}</dd></div>
+    <div><dt>Position</dt><dd data-testid="position">{% if position %}{{ position|ordinal }} of {{ class_size }}{% else %}-{% endif %}</dd></div>
+  </dl>
+
+  <footer class="signatures">
+    <p>Class teacher's signature: ____________________</p>
+    <p>Principal's signature: ____________________</p>
+  </footer>
+</article>
+{% endblock %}

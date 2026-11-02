@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}{% if is_new %}New notice{% else %}Edit notice{% endif %}{% endblock %}
+{% block content %}
+<section class="card narrow">
+  <h1>{% if is_new %}New notice{% else %}Edit notice{% endif %}</h1>
+  <form method="post" class="stack" novalidate>
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    {% for field in form %}
+      <div class="field{% if field.errors %} has-error{% endif %}">
+        {% if field.name == "pinned" %}
+          <label class="check">{{ field }} {{ field.label }}</label>
+        {% else %}
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+        {% endif %}
+        {% if field.help_text %}<small class="muted">{{ field.help_text }}</small>{% endif %}
+        {% for error in field.errors %}<p class="error">{{ error }}</p>{% endfor %}
+      </div>
+    {% endfor %}
+    <div class="row">
+      <button type="submit" class="primary">{% if is_new %}Post notice{% else %}Save changes{% endif %}</button>
+      <a href="{% url 'notices:dashboard' %}">Cancel</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

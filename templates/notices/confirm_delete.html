@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Take down notice{% endblock %}
+{% block content %}
+<section class="card narrow">
+  <h1>Take down “{{ notice.title }}”?</h1>
+  <p>It will disappear from the notice board straight away.</p>
+  <form method="post" class="row">
+    {% csrf_token %}
+    <button type="submit" class="danger">Take it down</button>
+    <a href="{% url 'notices:dashboard' %}">Cancel</a>
+  </form>
+</section>
+{% endblock %}

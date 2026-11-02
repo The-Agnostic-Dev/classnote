@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Teacher login{% endblock %}
+{% block content %}
+<section class="card narrow">
+  <h1>Teacher login</h1>
+  <p class="muted">Sign in to post notices and manage results.</p>
+  {% if form.errors %}
+    <p class="error">Your username and password didn't match. Please try again.</p>
+  {% endif %}
+  <form method="post" action="{% url 'login' %}" class="stack">
+    {% csrf_token %}
+    <label>Username {{ form.username }}</label>
+    <label>Password {{ form.password }}</label>
+    <button type="submit" class="primary">Log in</button>
+  </form>
+</section>
+{% endblock %}

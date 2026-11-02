@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}{{ subject.name }} scores{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>{{ subject.name }} · {{ school_class.name }}</h1>
+  <p class="muted">{{ term.name }}</p>
+</div>
+<p class="muted">CA is out of {{ ca_max }}, exam out of {{ exam_max }}. Leave both empty for a student who did not sit the subject.</p>
+
+<form method="post" class="card">
+  {% csrf_token %}
+  {{ formset.management_form }}
+  {% if formset.non_form_errors %}<div class="error">{{ formset.non_form_errors }}</div>{% endif %}
+  <table class="table scores">
+    <thead><tr><th>Student</th><th>CA ({{ ca_max }})</th><th>Exam ({{ exam_max }})</th><th></th></tr></thead>
+    <tbody>
+      {% for student, form in rows %}
+      <tr data-student-id="{{ student.pk }}">
+        <td>{{ form.student_id }}{{ student.full_name }}</td>
+        <td>{{ form.ca }}</td>
+        <td>{{ form.exam }}</td>
+        <td class="error">{{ form.non_field_errors }}{{ form.ca.errors }}{{ form.exam.errors }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="row">
+    <button type="submit" class="primary">Save scores</button>
+    <a href="{% url 'reports:results' school_class.pk %}?term={{ term.pk }}">Back to results</a>
+  </div>
+</form>
+{% endblock %}

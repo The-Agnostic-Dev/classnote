@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Notice board{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Notice board</h1>
+  <form method="get" class="inline-form">
+    <label for="class-filter">Show notices for</label>
+    <select id="class-filter" name="class" onchange="this.form.submit()">
+      <option value="">All classes</option>
+      {% for school_class in classes %}
+        <option value="{{ school_class.pk }}" {% if school_class == selected_class %}selected{% endif %}>{{ school_class.name }}</option>
+      {% endfor %}
+    </select>
+    <noscript><button type="submit">Filter</button></noscript>
+  </form>
+</div>
+
+{% if not items %}
+  <p class="empty">No notices right now.</p>
+{% endif %}
+
+<ul class="notices">
+  {% for item in items %}
+    {% with notice=item.notice %}
+    <li class="card notice{% if notice.pinned %} pinned{% endif %}" data-notice-id="{{ notice.pk }}" data-pinned="{{ notice.pinned|yesno:'true,false' }}">
+      <div class="notice-meta">
+        {% if notice.pinned %}<span class="tag pin">Pinned</span>{% endif %}
+        <span class="tag audience">{{ notice.audience_label }}</span>
+        {% if item.posted %}<span class="posted">{{ item.posted }}</span>{% endif %}
+        <time class="when" datetime="{{ notice.published_at|date:'c' }}">{{ notice.published_at|date:"j M Y, H:i" }}</time>
+      </div>
+      <h2><a href="{{ notice.get_absolute_url }}">{{ notice.title }}</a></h2>
+      <p>{{ notice.body|truncatewords:40 }}</p>
+      <p class="muted small">
+        Posted by {{ notice.author.get_full_name|default:notice.author.username }}
+        {% if notice.expires_on %}· Until {{ notice.expires_on|date:"j M Y" }}{% endif %}
+      </p>
+    </li>
+    {% endwith %}
+  {% endfor %}
+</ul>
+{% endblock %}

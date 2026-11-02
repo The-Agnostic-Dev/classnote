@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}{{ notice.title }}{% endblock %}
+{% block content %}
+<article class="card">
+  <p><a href="{% url 'notices:board' %}">← Notice board</a></p>
+  <h1>{{ notice.title }}</h1>
+  <p class="muted">
+    {{ notice.audience_label }} · {{ notice.published_at|date:"j M Y, H:i" }} ·
+    {{ notice.author.get_full_name|default:notice.author.username }}
+    {% if notice.expires_on %}· Until {{ notice.expires_on|date:"j M Y" }}{% endif %}
+  </p>
+  <div class="body">{{ notice.body|linebreaks }}</div>
+</article>
+{% endblock %}
