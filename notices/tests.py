@@ -45,6 +45,11 @@ class BoardTests(NoticeTestCase):
         self.assertNotContains(response, "Old news")
         self.assertContains(response, "Still running")
 
+    def test_notice_expiring_today_is_visible(self):
+        self.make_notice("Expires today", expires_on=timezone.localdate())
+        response = self.client.get(reverse("notices:board"))
+        self.assertContains(response, "Expires today")
+
     def test_class_filter_hides_other_classes(self):
         self.make_notice("JSS 1A trip", classes=[self.jss1])
         self.make_notice("JSS 2B trip", classes=[self.jss2])
