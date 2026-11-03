@@ -31,6 +31,12 @@ class GradeTests(TestCase):
     def test_rank_orders_best_first(self):
         self.assertEqual(rank({1: Decimal("55"), 2: Decimal("71.5"), 3: Decimal("60")}), {2: 1, 3: 2, 1: 3})
 
+    def test_rank_highest_average_is_first(self):
+        self.assertEqual(rank({1: Decimal("78.3"), 2: Decimal("74.0")}), {1: 1, 2: 2})
+
+    def test_rank_ties_share_position_and_skip_next(self):
+        self.assertEqual(rank({1: Decimal("70.0"), 2: Decimal("70.0"), 3: Decimal("65.0")}), {1: 1, 2: 1, 3: 3})
+
 
 class ReportDataTestCase(TestCase):
     @classmethod
