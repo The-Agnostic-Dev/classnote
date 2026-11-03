@@ -66,12 +66,11 @@ def rank(averages: dict[int, Decimal]) -> dict[int, int]:
 
 
 def class_positions(school_class: SchoolClass, term: Term) -> dict[int, int]:
-    rows = (
-        Score.objects.filter(student__school_class=school_class)
-        .values("student_id")
-        .annotate(points=Sum("total"), subjects=Count("id"))
-    )
-    averages = {row["student_id"]: Decimal(row["points"]) / row["subjects"] for row in rows}
+    averages = {}
+    for student in school_class.students.all():
+        average = student_average(student, term)
+        if average is not None:
+            averages[student.pk] = average
     return rank(averages)
 
 
