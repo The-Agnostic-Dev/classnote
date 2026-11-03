@@ -31,6 +31,12 @@ class GradeTests(TestCase):
     def test_rank_orders_best_first(self):
         self.assertEqual(rank({1: Decimal("55"), 2: Decimal("71.5"), 3: Decimal("60")}), {2: 1, 3: 2, 1: 3})
 
+    def test_rank_highest_average_is_first(self):
+        self.assertEqual(rank({1: Decimal("78.3"), 2: Decimal("74.0")}), {1: 1, 2: 2})
+
+    def test_rank_ties_share_position_and_skip_next(self):
+        self.assertEqual(rank({1: Decimal("70.0"), 2: Decimal("70.0"), 3: Decimal("65.0")}), {1: 1, 2: 1, 3: 3})
+
 
 class ReportDataTestCase(TestCase):
     @classmethod
@@ -59,6 +65,20 @@ class ScoreModelTests(ReportDataTestCase):
 
     def test_class_positions(self):
         self.assertEqual(class_positions(self.school_class, self.term), {self.ada.pk: 1, self.bayo.pk: 2})
+
+    def test_class_positions_with_reported_averages(self):
+        term = Term.objects.create(name="Regression Term", starts_on=self.term.starts_on, ends_on=self.term.ends_on)
+        school_class = SchoolClass.objects.create(name="JSS 1A Regression", class_teacher=self.teacher)
+        chiamaka = Student.objects.create(first_name="Chiamaka", last_name="Obi", admission_no="3", school_class=school_class)
+        tunde = Student.objects.create(first_name="Tunde", last_name="Bakare", admission_no="4", school_class=school_class)
+        subjects = [Subject.objects.create(name=f"Subject {i}", code=f"SUB{i}") for i in range(3)]
+        for subject, ca, exam in zip(subjects, [(40, 38), (40, 38), (40, 39)]):
+            Score.objects.create(student=chiamaka, subject=subject, term=term, ca=ca, exam=exam)
+        for subject, ca, exam in zip(subjects, [(40, 34), (40, 34), (40, 34)]):
+            Score.objects.create(student=tunde, subject=subject, term=term, ca=ca, exam=exam)
+        positions = class_positions(school_class, term)
+        self.assertEqual(positions[chiamaka.pk], 1)
+        self.assertEqual(positions[tunde.pk], 2)
 
 
 class ReportViewTests(ReportDataTestCase):

@@ -54,16 +54,23 @@ def student_average(student: Student, term: Term) -> Decimal | None:
 def rank(averages: dict[int, Decimal]) -> dict[int, int]:
     """Map student id to class position, best average first."""
     ordered = sorted(averages.items(), key=lambda item: item[1], reverse=True)
-    return {student_id: index + 1 for index, (student_id, _average) in enumerate(ordered)}
+    ranks = {}
+    previous_average = None
+    previous_rank = 0
+    for position, (student_id, average) in enumerate(ordered, start=1):
+        if average != previous_average:
+            previous_rank = position
+            previous_average = average
+        ranks[student_id] = previous_rank
+    return ranks
 
 
 def class_positions(school_class: SchoolClass, term: Term) -> dict[int, int]:
-    rows = (
-        Score.objects.filter(student__school_class=school_class)
-        .values("student_id")
-        .annotate(points=Sum("total"), subjects=Count("id"))
-    )
-    averages = {row["student_id"]: Decimal(row["points"]) / row["subjects"] for row in rows}
+    averages = {}
+    for student in school_class.students.all():
+        average = student_average(student, term)
+        if average is not None:
+            averages[student.pk] = average
     return rank(averages)
 
 
