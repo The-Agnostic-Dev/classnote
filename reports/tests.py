@@ -66,6 +66,20 @@ class ScoreModelTests(ReportDataTestCase):
     def test_class_positions(self):
         self.assertEqual(class_positions(self.school_class, self.term), {self.ada.pk: 1, self.bayo.pk: 2})
 
+    def test_class_positions_with_reported_averages(self):
+        term = Term.objects.create(name="Regression Term", starts_on=self.term.starts_on, ends_on=self.term.ends_on)
+        school_class = SchoolClass.objects.create(name="JSS 1A Regression", class_teacher=self.teacher)
+        chiamaka = Student.objects.create(first_name="Chiamaka", last_name="Obi", admission_no="3", school_class=school_class)
+        tunde = Student.objects.create(first_name="Tunde", last_name="Bakare", admission_no="4", school_class=school_class)
+        subjects = [Subject.objects.create(name=f"Subject {i}", code=f"SUB{i}") for i in range(3)]
+        for subject, ca, exam in zip(subjects, [(40, 38), (40, 38), (40, 39)]):
+            Score.objects.create(student=chiamaka, subject=subject, term=term, ca=ca, exam=exam)
+        for subject, ca, exam in zip(subjects, [(40, 34), (40, 34), (40, 34)]):
+            Score.objects.create(student=tunde, subject=subject, term=term, ca=ca, exam=exam)
+        positions = class_positions(school_class, term)
+        self.assertEqual(positions[chiamaka.pk], 1)
+        self.assertEqual(positions[tunde.pk], 2)
+
 
 class ReportViewTests(ReportDataTestCase):
     def setUp(self):
