@@ -30,6 +30,18 @@ class NoticeTestCase(TestCase):
         notice.audience.set(classes)
         return notice
 
+    def test_posted_label_uses_local_date_after_midnight(self):
+        from unittest.mock import patch
+
+        with timezone.override("Africa/Lagos"), patch("django.utils.timezone.localdate", return_value=date(2026, 11, 3)):
+            late_night = datetime(2026, 11, 2, 23, 30, tzinfo=dt_timezone.utc)
+            notice = self.make_notice("Late night notice", published_at=late_night)
+            self.assertEqual(posted_label(notice.published_at), "Today")
+
+            previous_day = datetime(2026, 11, 2, 12, 0, tzinfo=dt_timezone.utc)
+            prev_notice = self.make_notice("Previous day notice", published_at=previous_day)
+            self.assertEqual(posted_label(prev_notice.published_at), "Yesterday")
+
 
 class BoardTests(NoticeTestCase):
     def test_board_lists_current_notices(self):
