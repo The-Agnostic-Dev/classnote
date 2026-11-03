@@ -41,8 +41,8 @@ def notices_for_class(notices: list[Notice], school_class: SchoolClass | None) -
 
 def posted_label(published_at: datetime, today: date | None = None) -> str | None:
     """Friendly 'Today' / 'Yesterday' / 'N days ago' for recent notices."""
-    today = today or date.today()
-    days = (today - published_at.date()).days
+    today = today or timezone.localdate()
+    days = (today - timezone.localdate(published_at)).days
     if days <= 0:
         return "Today"
     if days == 1:
