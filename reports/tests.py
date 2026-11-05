@@ -81,6 +81,13 @@ class ReportViewTests(ReportDataTestCase):
         self.assertContains(response, "Mathematics")
         self.assertContains(response, "160")
 
+    def test_report_card_columns_not_swapped(self):
+        response = self.client.get(reverse("reports:report_card", args=[self.ada.pk]))
+        self.assertRegex(
+            response.content.decode(),
+            r'<td class="subject">Mathematics</td>\s*<td class="num">30</td>\s*<td class="num">50</td>',
+        )
+
     def test_entering_scores_for_a_new_subject(self):
         science = Subject.objects.create(name="Basic Science", code="BSC")
         url = reverse("reports:enter_scores", args=[self.school_class.pk, science.pk])
